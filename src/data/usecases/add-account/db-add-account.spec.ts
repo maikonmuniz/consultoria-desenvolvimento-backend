@@ -1,10 +1,5 @@
-import { DbAddAccount } from "./db-add-account"
-import { Encrypter } from '../../protocols/encrypter'
-
-interface SutTypes {
-    sut: DbAddAccount
-    encrypterStub: Encrypter
-}
+import { DbAddAccount } from "./db-add-account";
+import { Encrypter, AddAccountModel, AccountModel, AddAccountRepository } from './db-add-account-protocols';
 
 const makeEncrypter = (): Encrypter => {
     class EncrypterStub implements Encrypter {
@@ -15,12 +10,35 @@ const makeEncrypter = (): Encrypter => {
     return new EncrypterStub()
 }
 
+const makeAddAccountRepository = (): AddAccountRepository => {
+    class AddAccountRepositoryStub implements AddAccountRepository {
+        async add(accountData: AddAccountModel): Promise<AccountModel> {
+            const fakeAccount = {
+                id: 'valid_id',
+                name: 'valid_name',
+                email: 'valid_email',
+                password: 'hashed_password'
+            }
+            return new Promise(resolve => resolve(fakeAccount))
+        }
+    }
+    return new AddAccountRepositoryStub()
+}
+
+interface SutTypes {
+    sut: DbAddAccount
+    encrypterStub: Encrypter
+    addAccountRepositoryStub: AddAccountRepository
+}
+
 const makeSut = (): SutTypes => {
     const encrypterStub = makeEncrypter()
-    const sut = new DbAddAccount(encrypterStub)
+    const addAccountRepositoryStub = makeAddAccountRepository()
+    const sut = new DbAddAccount(encrypterStub, addAccountRepositoryStub)
     return {
         sut,
-        encrypterStub
+        encrypterStub,
+        addAccountRepositoryStub
     }
 }
 
@@ -37,5 +55,21 @@ describe("DbAddAccount Usecase", () => {
         }
         await sut.add(accountData);
         expect(encryptSpy).toHaveBeenCalledWith('valid_password')
+    })
+
+    test('Should return an account on success', async () => {
+        const { sut } = makeSut()
+        const accountData = {
+            name: 'valid_name',
+            email: 'valid_email',
+            password: 'valid_password'
+        }
+        const account = await sut.add(accountData)
+        expect(account).toEqual({
+            id: 'valid_id',
+            name: 'valid_name',
+            email: 'valid_email',
+            password: 'hashed_password'
+        })
     })
 })
