@@ -10,7 +10,17 @@ const mysqlHelper = {
             database: 'data_base_fake'
         }).promise()
     },
-    async consult(): Promise<consult> {
+    async insert(dados: account): Promise<account> {
+
+        this.client.query(`insert into products
+                                 (id, name, email, password)
+                            values
+                                 ("${dados.id}", "${dados.name}", "${dados.email}", "${dados.password}";`);
+
+        return dados
+
+    },
+    async consult(): Promise<account> {
         return this.client.query("select * from products;");
     },
     async disconnect() {
@@ -18,8 +28,11 @@ const mysqlHelper = {
     }
 }
 
-type consult = {
-    id: string, name: string, bar_code: string, price: number
+type account = {
+    id: string
+    , name: string
+    , email: string
+    , password: string
 }
 
 export default mysqlHelper;
