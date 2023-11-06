@@ -5,7 +5,8 @@ import { AccountModel } from '../../../../domain/models/account'
 
 export class AccountMySqlRepository implements AddAccountRepository {
     async add(accountData: AddAccountModel): Promise<AccountModel> {
-        await mysqlHelper.insert(accountData)
-        return new Promise(resolve => resolve(accountData))
+        const sql = `insert into account (name, email, password) values ("${accountData.name}", "${accountData.email}", "${accountData.password}");`
+        await mysqlHelper.query(sql)
+        return accountData
     }
 }

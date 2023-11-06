@@ -12,7 +12,7 @@ export class SignUpController implements Controller {
     }
 
     async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
-        try {
+            console.log('controle ', httpRequest.body)
             const requiredFields = ['name', 'email', 'password', 'passwordConfirmation']
             for (const field of requiredFields) {
                 if (!httpRequest.body[field]) {
@@ -33,8 +33,5 @@ export class SignUpController implements Controller {
                 password
             })
             return ok(account)
-        } catch (error) {
-            return serverError()
-        }
     }
 }
