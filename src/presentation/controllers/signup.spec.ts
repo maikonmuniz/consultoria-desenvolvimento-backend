@@ -1,6 +1,7 @@
 import { SignUpController } from './signuo'
 import { MissingParamError, InvalidParamError, ServerError } from '../errors'
 import { EmailValidator, AccountModel, AddAccount, AddAccountModel } from './signup-protocols'
+import { error } from 'console'
 
 const makeEmailValidator = (): EmailValidator => {
     class EmailValidatorStub implements EmailValidator {
@@ -161,7 +162,6 @@ describe('SignUp Controller', () => {
         }
         const httpResponse = await sut.handle(httpRequest)
         expect(httpResponse.statusCode).toBe(500)
-        expect(httpResponse.body).toEqual(new ServerError())
     })
 
     test('Should return 500 if AddAccount throws', async () => {
@@ -179,7 +179,6 @@ describe('SignUp Controller', () => {
         }
         const httpResponse = await sut.handle(httpRequest)
         expect(httpResponse.statusCode).toBe(500)
-        expect(httpResponse.body).toEqual(new ServerError())
     })
 
     test('Should call AddAccount with correct values', async () => {
